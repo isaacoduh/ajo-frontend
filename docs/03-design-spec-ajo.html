@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Àjọ — Design Spec AJO-DES-001</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo-950:#0D1A31;   /* Adire Night */
+    --indigo-800:#16294D;   /* Deep Dye   */
+    --indigo-600:#27447F;   /* Adire      */
+    --indigo-100:#E4EAF5;   /* Wash       */
+    --calico:#F4F1E8;       /* Calico     */
+    --paper:#FBFAF5;        /* Card       */
+    --brass:#C0912F;        /* Cowrie brass */
+    --brass-soft:#F0E3C4;
+    --leaf:#1E7A5C;         /* Cleared    */
+    --leaf-soft:#DDEFE7;
+    --clay:#B4432F;         /* Overdue    */
+    --clay-soft:#F6E2DD;
+    --ink:#101522;
+    --ink-60:rgba(16,21,34,.62);
+    --ink-35:rgba(16,21,34,.38);
+    --line:rgba(16,21,34,.12);
+    --display:"Bricolage Grotesque",sans-serif;
+    --body:"Instrument Sans",sans-serif;
+    --mono:"Spline Sans Mono",monospace;
+    --r-lg:22px; --r-md:16px; --r-sm:10px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--calico);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--brass-soft)}
+
+  /* ---------- spec-sheet chrome ---------- */
+  .spec-head{background:var(--indigo-950);color:var(--calico);padding:56px 6vw 64px;position:relative;overflow:hidden}
+  .spec-head::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(244,241,232,.14) 1.3px,transparent 1.3px);background-size:22px 22px;mask-image:linear-gradient(105deg,transparent 46%,#000 47%);pointer-events:none}
+  .spec-meta{display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:rgba(244,241,232,.66);margin-bottom:26px}
+  .spec-meta b{color:var(--brass);font-weight:600}
+  .spec-head h1{font-family:var(--display);font-weight:800;font-size:clamp(40px,6vw,84px);line-height:.98;letter-spacing:-.02em;max-width:16ch}
+  .spec-head h1 em{font-style:normal;color:var(--brass)}
+  .spec-head p{margin-top:22px;max-width:56ch;font-size:16.5px;line-height:1.55;color:rgba(244,241,232,.82)}
+  .spec-head .rules{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap}
+  .rule-chip{border:1px solid rgba(244,241,232,.28);border-radius:999px;padding:8px 15px;font-size:13px;color:rgba(244,241,232,.85)}
+
+  .band{padding:60px 6vw}
+  .band h2{font-family:var(--display);font-weight:700;font-size:clamp(24px,3vw,36px);letter-spacing:-.015em}
+  .band .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--indigo-600);margin-bottom:10px}
+  .band .lede{color:var(--ink-60);max-width:62ch;margin-top:10px;line-height:1.55}
+
+  .screens{display:flex;gap:44px;flex-wrap:wrap;margin-top:44px;align-items:flex-start;justify-content:center}
+  .screen-slot{display:flex;flex-direction:column;gap:14px;align-items:center}
+  .callouts{display:flex;gap:8px;flex-wrap:wrap;max-width:330px;justify-content:center}
+  .co{font-family:var(--mono);font-size:11px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--ink-60)}
+  .co b{color:var(--indigo-600);font-weight:600}
+  .screen-name{font-family:var(--display);font-weight:600;font-size:15px}
+
+  /* ---------- phone ---------- */
+  .phone{width:330px;background:var(--indigo-950);border-radius:44px;padding:10px;box-shadow:0 24px 60px -24px rgba(13,26,49,.45)}
+  .viewport{background:var(--paper);border-radius:36px;overflow:hidden;min-height:660px;display:flex;flex-direction:column;position:relative}
+  .statusbar{display:flex;justify-content:space-between;padding:12px 22px 4px;font-family:var(--mono);font-size:11px;color:var(--ink-35)}
+  .app{padding:10px 18px 22px;display:flex;flex-direction:column;gap:14px;flex:1}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:16px}
+  .h-eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-35)}
+  .money{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .btn{display:block;text-align:center;border-radius:14px;padding:14px;font-weight:600;font-size:15px;font-family:var(--body)}
+  .btn-primary{background:var(--indigo-800);color:var(--calico)}
+  .btn-ghost{border:1.5px solid var(--indigo-800);color:var(--indigo-800)}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:600}
+  .pill-leaf{background:var(--leaf-soft);color:var(--leaf)}
+  .pill-clay{background:var(--clay-soft);color:var(--clay)}
+  .pill-brass{background:var(--brass-soft);color:#8a6a1d}
+  .pill-wash{background:var(--indigo-100);color:var(--indigo-600)}
+  .dot{width:7px;height:7px;border-radius:99px;background:currentColor}
+
+  /* Screen 1 — home */
+  .greet h3{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.01em}
+  .greet span{color:var(--ink-60);font-size:13px}
+  .balance-card{background:var(--indigo-950);color:var(--calico);border:none;position:relative;overflow:hidden}
+  .balance-card::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(244,241,232,.12) 1.2px,transparent 1.2px);background-size:18px 18px;mask-image:linear-gradient(115deg,transparent 55%,#000 56%)}
+  .balance-card .h-eyebrow{color:rgba(244,241,232,.55)}
+  .balance-card .amt{font-size:34px;font-weight:600;margin:6px 0 4px}
+  .balance-card .safe{font-size:11.5px;color:rgba(244,241,232,.66);display:flex;gap:6px;align-items:center}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .list-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+  .list-row:last-child{border-bottom:none;padding-bottom:0}
+  .list-row .t{font-weight:600;font-size:14px}
+  .list-row .s{font-size:12px;color:var(--ink-60);margin-top:2px}
+  .mini-ring{width:34px;height:34px;flex:none}
+  .tabbar{display:flex;justify-content:space-around;border-top:1px solid var(--line);padding:12px 6px 4px;font-size:11px;color:var(--ink-35);font-weight:600;margin-top:auto}
+  .tabbar .on{color:var(--indigo-800)}
+  .tabbar div{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .tabglyph{width:20px;height:20px;border-radius:6px;background:currentColor;opacity:.9}
+  .tabglyph.circ{border-radius:99px;background:transparent;border:2.5px solid currentColor}
+  .tabglyph.ring{border-radius:99px;background:transparent;border:2.5px dashed currentColor}
+  .tabglyph.bar{height:14px;margin-top:3px;border-radius:3px}
+
+  /* Screen 2 — circle detail ring */
+  .ringwrap{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 0 2px}
+  .legend{display:flex;gap:14px;font-size:11px;color:var(--ink-60);margin-top:2px}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:5px}
+
+  /* Screen 3 — draw */
+  .hashbox{font-family:var(--mono);font-size:11px;line-height:1.6;background:var(--indigo-100);border-radius:var(--r-sm);padding:12px;color:var(--indigo-800);word-break:break-all}
+  .order-li{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .order-li:last-child{border:none}
+  .order-no{font-family:var(--mono);font-size:12px;width:26px;height:26px;border-radius:99px;display:flex;align-items:center;justify-content:center;background:var(--indigo-100);color:var(--indigo-800);font-weight:600;flex:none}
+  .order-li.me .order-no{background:var(--brass);color:#fff}
+
+  /* Screen 4 — pay */
+  .amount-lock{text-align:center;padding:10px 0 4px}
+  .amount-lock .amt{font-size:44px;font-weight:600}
+  .amount-lock .lock{font-size:12px;color:var(--ink-60);margin-top:4px}
+  .feeline{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-60);padding:8px 0;border-bottom:1px dashed var(--line)}
+  .feeline:last-child{border:none;color:var(--ink);font-weight:600}
+
+  /* ---------- tokens ---------- */
+  .tok-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:30px}
+  .swatch{border-radius:var(--r-md);border:1px solid var(--line);overflow:hidden;background:#fff}
+  .swatch .chip{height:84px}
+  .swatch .lab{padding:10px 12px}
+  .swatch .lab b{display:block;font-size:13px}
+  .swatch .lab span{font-family:var(--mono);font-size:11px;color:var(--ink-60)}
+  .type-specimen{display:grid;gap:18px;margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:28px}
+  .type-specimen .row{align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:16px;flex-wrap:wrap;gap:6px}
+  .type-specimen .row:last-child{border:none;padding-bottom:0}
+  .type-specimen .use{font-family:var(--mono);font-size:11px;color:var(--ink-60);letter-spacing:.06em}
+
+  .comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:30px}
+  .comp{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;display:flex;flex-direction:column;gap:12px}
+  .comp h4{font-family:var(--display);font-size:15px;font-weight:600}
+
+  .voice{background:var(--indigo-950);color:var(--calico)}
+  .voice .kicker{color:var(--brass)}
+  .voice h2{color:var(--calico)}
+  .voice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:30px}
+  .voice-card{border:1px solid rgba(244,241,232,.2);border-radius:var(--r-md);padding:20px}
+  .voice-card .no{color:var(--clay-soft);text-decoration:line-through;opacity:.75}
+  .voice-card .yes{color:#CBE8DB}
+  .voice-card p{font-size:14px;line-height:1.55;margin-top:6px}
+  .voice-card h4{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,241,232,.6)}
+
+  .footnote{padding:34px 6vw 60px;font-family:var(--mono);font-size:12px;color:var(--ink-60);border-top:1px solid var(--line)}
+  @media (max-width:760px){ .screens{gap:34px} .phone{width:300px} }
+  @media (prefers-reduced-motion:no-preference){
+    .screen-slot{animation:rise .6s ease both}
+    .screen-slot:nth-child(2){animation-delay:.08s}.screen-slot:nth-child(3){animation-delay:.16s}.screen-slot:nth-child(4){animation-delay:.24s}
+    @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="spec-head">
+  <div class="spec-meta">
+    <span>DOC <b>AJO-DES-001</b></span><span>V <b>0.9</b></span><span>PLATFORM <b>iOS · Android</b></span><span>WCAG <b>2.2 AA</b></span><span>IMPLEMENTS <b>AJO-PRD-001</b></span>
+  </div>
+  <h1>The circle, made <em>visible.</em></h1>
+  <p>Àjọ digitises esusu for immigrant civil servants in the UK. The visual language borrows from adire — Yoruba indigo resist-dye cloth: deep indigo grounds, undyed calico, brass accents. The interface behaves like a bank and feels like the circle: every screen answers "where is my money, and when do I get it?"</p>
+  <div class="rules">
+    <span class="rule-chip">Money is always tabular mono</span>
+    <span class="rule-chip">Green = cleared, never "success" decoration</span>
+    <span class="rule-chip">Names carry their diacritics</span>
+    <span class="rule-chip">No confetti near money</span>
+    <span class="rule-chip">Reading age ≈ 9</span>
+  </div>
+</header>
+
+<!-- ================= SCREENS ================= -->
+<section class="band">
+  <div class="kicker">01 · Key screens — Phase 1</div>
+  <h2>Four moments that carry the product</h2>
+  <p class="lede">Callout chips reference PRD requirement IDs. The rotation ring is the signature element: one glyph that shows order, progress and whose turn it is — the coordinator's notebook, replaced.</p>
+
+  <div class="screens">
+
+    <!-- SCREEN 1 · HOME -->
+    <div class="screen-slot">
+      <div class="phone"><div class="viewport">
+        <div class="statusbar"><span>09:41</span><span>●●●●</span></div>
+        <div class="app">
+          <div class="greet row">
+            <div><h3>Ẹ káàárọ̀, Amara</h3><span>Thursday 22 July</span></div>
+            <span class="pill pill-wash">Trust · 14 cycles</span>
+          </div>
+          <div class="card balance-card">
+            <div class="h-eyebrow">Your wallet</div>
+            <div class="amt money">£1,240.00</div>
+            <div class="safe"><span class="dot" style="background:var(--brass)"></span> Safeguarded with our regulated partner</div>
+          </div>
+          <div class="card">
+            <div class="row">
+              <div><div class="t" style="font-weight:600;font-size:14px">July contribution due Friday</div>
+              <div class="s" style="font-size:12px;color:var(--ink-60);margin-top:2px">Lagos Ladies Circle · <span class="money">£250.00</span></div></div>
+              <span class="pill pill-brass">2 days</span>
+            </div>
+            <a class="btn btn-primary" style="margin-top:12px">Pay contribution</a>
+          </div>
+          <div class="card">
+            <div class="h-eyebrow" style="margin-bottom:6px">Your circles</div>
+            <div class="list-row">
+              <svg class="mini-ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="14" fill="none" stroke="#E4EAF5" stroke-width="5"/><circle cx="18" cy="18" r="14" fill="none" stroke="#1E7A5C" stroke-width="5" stroke-dasharray="66 88" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+              <div style="flex:1;margin-left:10px"><div class="t">Lagos Ladies Circle</div><div class="s">Cycle 6 of 8 · pot <span class="money">£2,000</span></div></div>
+              <span class="pill pill-leaf"><span class="dot"></span>On track</span>
+            </div>
+            <div class="list-row">
+              <svg class="mini-ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="14" fill="none" stroke="#E4EAF5" stroke-width="5"/><circle cx="18" cy="18" r="14" fill="none" stroke="#C0912F" stroke-width="5" stroke-dasharray="22 88" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+              <div style="flex:1;margin-left:10px"><div class="t">DWP Leeds Colleagues</div><div class="s">Cycle 2 of 10 · your turn: Nov</div></div>
+              <span class="pill pill-brass">Collecting</span>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="on"><span class="tabglyph bar"></span>Home</div>
+            <div><span class="tabglyph ring"></span>Circles</div>
+            <div><span class="tabglyph circ"></span>Save</div>
+            <div><span class="tabglyph" style="border-radius:99px;opacity:.35"></span>You</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="screen-name">1 · Home</div>
+      <div class="callouts"><span class="co"><b>B4</b> balance from ledger</span><span class="co"><b>B5</b> plain descriptors</span><span class="co"><b>D1</b> trust chip</span><span class="co">Safeguarding line always on wallet</span></div>
+    </div>
+
+    <!-- SCREEN 2 · CIRCLE DETAIL -->
+    <div class="screen-slot">
+      <div class="phone"><div class="viewport">
+        <div class="statusbar"><span>09:41</span><span>●●●●</span></div>
+        <div class="app">
+          <div class="row">
+            <div><div class="h-eyebrow">Circle · 8 members</div><h3 style="font-family:var(--display);font-weight:700;font-size:20px">Lagos Ladies Circle</h3></div>
+            <span class="pill pill-leaf"><span class="dot"></span>Cycle 6/8</span>
+          </div>
+          <div class="card ringwrap">
+            <svg width="228" height="228" viewBox="0 0 228 228" role="img" aria-label="Rotation ring: 8 members, 5 paid, Folake receives this cycle">
+              <circle cx="114" cy="114" r="86" fill="none" stroke="#E4EAF5" stroke-width="3"/>
+              <!-- members clockwise from top -->
+              <g font-family="Instrument Sans" font-size="10.5" text-anchor="middle">
+                <!-- paid -->
+                <circle cx="114" cy="28"  r="15" fill="#1E7A5C"/><text x="114" y="32"  fill="#fff" font-weight="600">TA</text>
+                <circle cx="175" cy="53"  r="15" fill="#1E7A5C"/><text x="175" y="57"  fill="#fff" font-weight="600">BO</text>
+                <circle cx="200" cy="114" r="15" fill="#1E7A5C"/><text x="200" y="118" fill="#fff" font-weight="600">AM</text>
+                <circle cx="175" cy="175" r="15" fill="#1E7A5C"/><text x="175" y="179" fill="#fff" font-weight="600">NK</text>
+                <circle cx="114" cy="200" r="15" fill="#1E7A5C"/><text x="114" y="204" fill="#fff" font-weight="600">CH</text>
+                <!-- unpaid -->
+                <circle cx="53"  cy="175" r="15" fill="#fff" stroke="#C0912F" stroke-width="2"/><text x="53" y="179" fill="#8a6a1d" font-weight="600">YE</text>
+                <circle cx="28"  cy="114" r="15" fill="#fff" stroke="#C0912F" stroke-width="2"/><text x="28" y="118" fill="#8a6a1d" font-weight="600">DA</text>
+                <!-- recipient -->
+                <circle cx="53" cy="53" r="18" fill="#C0912F"/><text x="53" y="57" fill="#fff" font-weight="700">FO</text>
+                <circle cx="53" cy="53" r="24" fill="none" stroke="#C0912F" stroke-width="1.5" stroke-dasharray="3 4"/>
+              </g>
+              <text x="114" y="106" text-anchor="middle" font-family="Spline Sans Mono" font-size="20" font-weight="600" fill="#101522">£1,250</text>
+              <text x="114" y="124" text-anchor="middle" font-family="Instrument Sans" font-size="10.5" fill="rgba(16,21,34,.55)">of £2,000 collected</text>
+              <text x="114" y="140" text-anchor="middle" font-family="Instrument Sans" font-size="10.5" font-weight="600" fill="#8a6a1d">Fọláke receives · 31 Jul</text>
+            </svg>
+            <div class="legend"><span><i style="background:#1E7A5C"></i>Paid</span><span><i style="background:#fff;border:1.5px solid #C0912F"></i>Due</span><span><i style="background:#C0912F"></i>Receives</span></div>
+          </div>
+          <div class="card">
+            <div class="h-eyebrow" style="margin-bottom:4px">This cycle</div>
+            <div class="list-row"><div class="t">Yẹmisi A.</div><span class="pill pill-brass">Due Fri</span></div>
+            <div class="list-row"><div class="t">Dayọ O.</div><span class="pill pill-clay">2 days late</span></div>
+          </div>
+          <a class="btn btn-ghost">View circle ledger</a>
+        </div>
+      </div></div>
+      <div class="screen-name">2 · Circle — rotation ring</div>
+      <div class="callouts"><span class="co"><b>C8</b> full transparency</span><span class="co"><b>C6</b> late = fact, not shame</span><span class="co">Signature element: the ring</span></div>
+    </div>
+
+    <!-- SCREEN 3 · THE DRAW -->
+    <div class="screen-slot">
+      <div class="phone"><div class="viewport">
+        <div class="statusbar"><span>09:41</span><span>●●●●</span></div>
+        <div class="app">
+          <div><div class="h-eyebrow">DWP Leeds Colleagues</div>
+          <h3 style="font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.01em">The draw is done — and you can check it.</h3></div>
+          <div class="card">
+            <div class="h-eyebrow">Sealed before the draw</div>
+            <div class="hashbox">sha256 · 9f2c 41ab 07de 55c1 8e3a b6f0 2299 d4e7 …</div>
+            <div class="h-eyebrow" style="margin-top:12px">Revealed after</div>
+            <div class="hashbox" style="background:var(--leaf-soft);color:var(--leaf)">seed · 6b17 e2c9 … ✓ order verifies</div>
+            <p style="font-size:12.5px;color:var(--ink-60);margin-top:10px;line-height:1.5">We locked the order in before anyone could see it. Anyone in the circle can re-run the maths.</p>
+          </div>
+          <div class="card">
+            <div class="h-eyebrow" style="margin-bottom:4px">Payout order</div>
+            <div class="order-li"><span class="order-no">1</span><div class="t" style="font-weight:600;font-size:14px">Chidi N.</div><span style="margin-left:auto;font-size:12px;color:var(--ink-60)">Aug</span></div>
+            <div class="order-li"><span class="order-no">2</span><div class="t" style="font-weight:600;font-size:14px">Margaret O.</div><span style="margin-left:auto;font-size:12px;color:var(--ink-60)">Sep</span></div>
+            <div class="order-li me"><span class="order-no">3</span><div class="t" style="font-weight:600;font-size:14px">You</div><span class="pill pill-brass" style="margin-left:auto">Oct · £2,500</span></div>
+            <div class="order-li"><span class="order-no">4</span><div class="t" style="font-weight:600;font-size:14px">Kwame A.</div><span style="margin-left:auto;font-size:12px;color:var(--ink-60)">Nov</span></div>
+          </div>
+          <a class="btn btn-primary">Accept and lock circle</a>
+        </div>
+      </div></div>
+      <div class="screen-name">3 · The verifiable draw</div>
+      <div class="callouts"><span class="co"><b>C3</b> commit–reveal draw</span><span class="co"><b>C2</b> agreement lock</span><span class="co">Turns "was it rigged?" into maths</span></div>
+    </div>
+
+    <!-- SCREEN 4 · PAY -->
+    <div class="screen-slot">
+      <div class="phone"><div class="viewport">
+        <div class="statusbar"><span>09:41</span><span>●●●●</span></div>
+        <div class="app">
+          <div><div class="h-eyebrow">Lagos Ladies Circle · Cycle 6</div>
+          <h3 style="font-family:var(--display);font-weight:700;font-size:20px">July contribution</h3></div>
+          <div class="card">
+            <div class="amount-lock">
+              <div class="amt money">£250.00</div>
+              <div class="lock">Fixed by your Circle Agreement · v1</div>
+            </div>
+            <div class="feeline"><span>From</span><span>Your Àjọ wallet</span></div>
+            <div class="feeline"><span>To</span><span>Circle pot — cycle 6</span></div>
+            <div class="feeline"><span>Àjọ fee</span><span class="money">£0.00 <span style="color:var(--ink-35)">(charged on payout)</span></span></div>
+            <div class="feeline"><span>Total today</span><span class="money">£250.00</span></div>
+          </div>
+          <div class="card" style="background:var(--indigo-100);border:none">
+            <div class="row"><div style="font-size:13px;line-height:1.5;color:var(--indigo-800)"><b>Wallet short by <span class="money">£110</span>?</b><br>Top up from your bank in one tap — we'll collect the moment it lands.</div></div>
+            <a class="btn btn-ghost" style="margin-top:10px;background:#fff">Top up via your bank</a>
+          </div>
+          <a class="btn btn-primary">Confirm with Face ID</a>
+          <p style="font-size:11.5px;color:var(--ink-35);text-align:center;line-height:1.5">E-money safeguarded by our regulated partner.<br>Àjọ is not a bank; FSCS does not apply.</p>
+        </div>
+      </div></div>
+      <div class="screen-name">4 · Contribution</div>
+      <div class="callouts"><span class="co"><b>C4</b> atomic collection</span><span class="co"><b>B2</b> Open Banking top-up</span><span class="co">SCA step-up on confirm</span><span class="co">Disclosure fixed to footer</span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= TOKENS ================= -->
+<section class="band" style="background:var(--paper);border-top:1px solid var(--line)">
+  <div class="kicker">02 · Foundations</div>
+  <h2>Colour — the adire system</h2>
+  <p class="lede">Indigo grounds carry trust and identity; calico keeps long reading surfaces calm; brass is reserved for "your turn" and money-adjacent emphasis. Green and clay are semantic only — cleared and overdue — never decoration. All pairings meet 4.5:1.</p>
+  <div class="tok-grid">
+    <div class="swatch"><div class="chip" style="background:#0D1A31"></div><div class="lab"><b>Adire Night</b><span>#0D1A31 · grounds, wallet</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#16294D"></div><div class="lab"><b>Deep Dye</b><span>#16294D · primary action</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#27447F"></div><div class="lab"><b>Adire</b><span>#27447F · links, info</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#F4F1E8"></div><div class="lab"><b>Calico</b><span>#F4F1E8 · app canvas</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#C0912F"></div><div class="lab"><b>Cowrie Brass</b><span>#C0912F · your turn, emphasis</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#1E7A5C"></div><div class="lab"><b>Cleared</b><span>#1E7A5C · paid, settled</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#B4432F"></div><div class="lab"><b>Clay</b><span>#B4432F · overdue, blocked</span></div></div>
+  </div>
+
+  <h2 style="margin-top:56px">Type</h2>
+  <div class="type-specimen">
+    <div class="row"><span style="font-family:var(--display);font-weight:800;font-size:34px;letter-spacing:-.02em">Bricolage Grotesque · Ẹ káàárọ̀</span><span class="use">DISPLAY · headings, numbers of meaning · full diacritic coverage required</span></div>
+    <div class="row"><span style="font-family:var(--body);font-size:17px">Instrument Sans — every contribution, explained in plain English before you confirm it.</span><span class="use">BODY / UI · 15–17px · line-height 1.5</span></div>
+    <div class="row"><span style="font-family:var(--mono);font-size:16px">£2,000.00 · sha256 9f2c…</span><span class="use">DATA · Spline Sans Mono · tabular numerals · all money, hashes, refs</span></div>
+  </div>
+</section>
+
+<!-- ================= COMPONENTS ================= -->
+<section class="band">
+  <div class="kicker">03 · Components</div>
+  <h2>States that never lie</h2>
+  <div class="comp-grid">
+    <div class="comp"><h4>Payment status pills</h4>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="pill pill-leaf"><span class="dot"></span>Paid · 18 Jul</span>
+        <span class="pill pill-brass">Due Friday</span>
+        <span class="pill pill-clay">2 days late</span>
+        <span class="pill pill-wash">Reviewing</span>
+      </div>
+      <p style="font-size:13px;color:var(--ink-60);line-height:1.5">Late is stated as elapsed time — a fact — never "missed!!" or member-shaming copy. Vulnerable-member flags suppress the clay state pending human review (PRD E4).</p>
+    </div>
+    <div class="comp"><h4>Buttons</h4>
+      <a class="btn btn-primary">Pay contribution</a>
+      <a class="btn btn-ghost">View circle ledger</a>
+      <p style="font-size:13px;color:var(--ink-60);line-height:1.5">Verbs say what happens: "Pay contribution", "Withdraw to my bank". Never "Submit". Money-moving buttons always trigger SCA step-up.</p>
+    </div>
+    <div class="comp"><h4>Trust profile card</h4>
+      <div class="card" style="border-radius:14px">
+        <div class="row"><b style="font-family:var(--display)">Amara Adeyemi</b><span class="pill pill-wash">Member since 2026</span></div>
+        <div style="display:flex;gap:18px;margin-top:10px;font-size:12.5px;color:var(--ink-60)">
+          <div><div class="money" style="font-size:19px;color:var(--ink)">14</div>cycles done</div>
+          <div><div class="money" style="font-size:19px;color:var(--ink)">100%</div>on time</div>
+          <div><div class="money" style="font-size:19px;color:var(--ink)">0</div>defaults</div>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--ink-60);line-height:1.5">Facts, not a score (PRD D2). Shown to circles she asks to join, with her consent.</p>
+    </div>
+    <div class="comp"><h4>Error pattern</h4>
+      <div class="card" style="border-left:4px solid var(--clay);border-radius:12px">
+        <b style="font-size:14px">That account name doesn't match</b>
+        <p style="font-size:13px;color:var(--ink-60);line-height:1.5;margin-top:4px">Withdrawals can only go to an account in your own name — it's how we keep circle money safe. Check the name matches your ID exactly.</p>
+      </div>
+      <p style="font-size:13px;color:var(--ink-60);line-height:1.5">What happened → why → what to do. Errors never apologise, never blame.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VOICE ================= -->
+<section class="band voice">
+  <div class="kicker">04 · Voice</div>
+  <h2>Sound like the trusted elder, write like a bank</h2>
+  <div class="voice-grid">
+    <div class="voice-card"><h4>Money is literal</h4>
+      <p><span class="no">"Your funds are being processed 🎉"</span><br><span class="yes">"£2,000 sent to your wallet. Arrives by 2pm today."</span></p></div>
+    <div class="voice-card"><h4>Culture is respected, not costumed</h4>
+      <p><span class="no">"Welcome to the tribe!"</span><br><span class="yes">"Ẹ káàbọ̀, Amara — your circle is ready."</span> Greetings localise (Yorùbá, Twi, Igbo, English); financial terms never do.</p></div>
+    <div class="voice-card"><h4>Honest about status</h4>
+      <p><span class="no">Silent spinner on partner outage</span><br><span class="yes">"Payments are delayed today. Your money is safe and nothing is lost — we'll confirm when it moves."</span></p></div>
+  </div>
+</section>
+
+<div class="footnote">AJO-DES-001 · Accessibility floor: 4.5:1 contrast, 44pt touch targets, full dynamic-type support, reduced-motion honoured, screen-reader labels on the rotation ring ("8 members, 5 paid, Fọláke receives on 31 July"). Handoff: tokens exported as JSON to the design-system package; ring component built once, reused at 3 sizes.</div>
+
+</body>
+</html>
