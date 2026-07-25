@@ -27,7 +27,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Àjọ | Digital esusu circles',
+      },
+      {
+        name: 'description',
+        content:
+          'A simple way for family, friends, and community groups to save together, track contributions, and know whose turn is next.',
       },
     ],
     links: [
