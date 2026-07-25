@@ -46,7 +46,8 @@ function LandingPage() {
           <nav className="nav-links" aria-label="Landing page">
             <a href="#how-it-works">How it works</a>
             <a href="#trust">Why it helps</a>
-            <a href="#join">Join</a>
+            <a href="/login">Log in</a>
+            <a className="nav-action" href="/register">Sign up</a>
           </nav>
         </header>
 
@@ -125,7 +126,7 @@ function LandingPage() {
           Invite your people, agree the amount, and let Àjọ help everyone stay
           clear on payments, payouts, and whose turn is coming up.
         </p>
-        <a className="button button-primary" href="/welcome">
+        <a className="button button-primary" href="/register">
           Get started
         </a>
       </section>
