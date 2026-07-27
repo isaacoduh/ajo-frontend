@@ -1,10 +1,40 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 
 import coverImage from '../../docs/assets/ajo-app-cover.png'
+import { register, saveSession } from '../api'
 
 export const Route = createFileRoute('/register')({ component: RegisterPage })
 
 function RegisterPage() {
+  const navigate = useNavigate()
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setErrorMessage('')
+    setIsSubmitting(true)
+
+    const formData = new FormData(event.currentTarget)
+    const firstName = String(formData.get('firstName')).trim()
+    const lastName = String(formData.get('lastName')).trim()
+    const email = String(formData.get('email')).trim().toLowerCase()
+    const password = String(formData.get('password'))
+    const displayName = [firstName, lastName].filter(Boolean).join(' ')
+
+    try {
+      const tokenPair = await register(email, password, displayName)
+      saveSession(tokenPair)
+      void navigate({ to: '/home' })
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Could not create account.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <main className="auth-shell">
       <section
@@ -34,7 +64,7 @@ function RegisterPage() {
             this.
           </p>
 
-          <form className="auth-form">
+          <form className="auth-form" onSubmit={handleSubmit}>
             <div className="field-row">
               <div className="field-group">
                 <label htmlFor="register-first-name">First name</label>
@@ -81,6 +111,7 @@ function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 placeholder="Create a password"
+                minLength={12}
                 required
               />
             </div>
@@ -90,8 +121,18 @@ function RegisterPage() {
               groups you are part of.
             </p>
 
-            <button className="button button-primary auth-submit" type="submit">
-              Create account
+            {errorMessage ? (
+              <p className="auth-error" role="alert">
+                {errorMessage}
+              </p>
+            ) : null}
+
+            <button
+              className="button button-primary auth-submit"
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 

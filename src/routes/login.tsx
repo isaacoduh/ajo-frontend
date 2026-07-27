@@ -3,28 +3,33 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 
 import coverImage from '../../docs/assets/ajo-app-cover.png'
-import { createMockSession, mockUser } from '../mock-auth'
+import { login, saveSession } from '../api'
 
 export const Route = createFileRoute('/login')({ component: LoginPage })
 
 function LoginPage() {
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setErrorMessage('')
+    setIsSubmitting(true)
 
     const formData = new FormData(event.currentTarget)
     const email = String(formData.get('email')).trim().toLowerCase()
     const password = String(formData.get('password'))
 
-    if (email !== mockUser.email || password !== mockUser.password) {
-      setErrorMessage('That email or password does not match our demo account.')
-      return
+    try {
+      const tokenPair = await login(email, password)
+      saveSession(tokenPair)
+      void navigate({ to: '/home' })
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Could not log in.')
+    } finally {
+      setIsSubmitting(false)
     }
-
-    createMockSession(mockUser)
-    void navigate({ to: '/home' })
   }
 
   return (
@@ -91,8 +96,12 @@ function LoginPage() {
               </p>
             ) : null}
 
-            <button className="button button-primary auth-submit" type="submit">
-              Log in
+            <button
+              className="button button-primary auth-submit"
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Logging in...' : 'Log in'}
             </button>
           </form>
 
