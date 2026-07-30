@@ -42,6 +42,22 @@ export interface WalletActivityResponse {
   next_cursor: string | null
 }
 
+export interface WalletActionResponse {
+  id: string
+  amount_minor: number
+  currency: string
+  state: string
+}
+
+export interface WalletStatementResponse {
+  period: string
+  currency: string
+  opening_balance_minor: number
+  movement_minor: number
+  closing_balance_minor: number
+  journal_entry_ids: string[]
+}
+
 interface ProblemDetail {
   detail?: string
   title?: string
@@ -122,6 +138,37 @@ export async function getWalletBalance(): Promise<WalletBalanceResponse> {
 
 export async function getWalletActivity(limit = 5): Promise<WalletActivityResponse> {
   return authRequest<WalletActivityResponse>(`/wallet/activity?limit=${limit}`)
+}
+
+export async function createWalletTopup(
+  amountMinor: number,
+  currency: string,
+): Promise<WalletActionResponse> {
+  return authRequest<WalletActionResponse>('/wallet/topups', {
+    method: 'POST',
+    body: JSON.stringify({ amount_minor: amountMinor, currency }),
+  })
+}
+
+export async function createWalletWithdrawal(
+  amountMinor: number,
+  currency: string,
+): Promise<WalletActionResponse> {
+  return authRequest<WalletActionResponse>('/wallet/withdrawals', {
+    method: 'POST',
+    body: JSON.stringify({ amount_minor: amountMinor, currency }),
+  })
+}
+
+export async function getWalletStatement(period: string): Promise<WalletStatementResponse> {
+  return authRequest<WalletStatementResponse>(`/statements/${encodeURIComponent(period)}`)
+}
+
+export async function logoutAll() {
+  await authRequest<void>('/auth/logout-all', {
+    method: 'POST',
+  })
+  clearSession()
 }
 
 export async function logout() {
