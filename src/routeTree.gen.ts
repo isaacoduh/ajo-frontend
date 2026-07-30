@@ -14,6 +14,8 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as CirclesCircleIdRouteImport } from './routes/circles.$circleId'
+import { Route as CirclesNewRouteImport } from './routes/circles.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +42,16 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CirclesCircleIdRoute = CirclesCircleIdRouteImport.update({
+  id: '/circles/$circleId',
+  path: '/circles/$circleId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CirclesNewRoute = CirclesNewRouteImport.update({
+  id: '/circles/new',
+  path: '/circles/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +59,8 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/circles/$circleId': typeof CirclesCircleIdRoute
+  '/circles/new': typeof CirclesNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +68,8 @@ export interface FileRoutesByTo {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/circles/$circleId': typeof CirclesCircleIdRoute
+  '/circles/new': typeof CirclesNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +78,37 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/circles/$circleId': typeof CirclesCircleIdRoute
+  '/circles/new': typeof CirclesNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/forgot-password' | '/home' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/home'
+    | '/login'
+    | '/register'
+    | '/circles/$circleId'
+    | '/circles/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/forgot-password' | '/home' | '/login' | '/register'
-  id: '__root__' | '/' | '/forgot-password' | '/home' | '/login' | '/register'
+  to:
+    | '/'
+    | '/forgot-password'
+    | '/home'
+    | '/login'
+    | '/register'
+    | '/circles/$circleId'
+    | '/circles/new'
+  id:
+    | '__root__'
+    | '/'
+    | '/forgot-password'
+    | '/home'
+    | '/login'
+    | '/register'
+    | '/circles/$circleId'
+    | '/circles/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +117,8 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  CirclesCircleIdRoute: typeof CirclesCircleIdRoute
+  CirclesNewRoute: typeof CirclesNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +158,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/circles/$circleId': {
+      id: '/circles/$circleId'
+      path: '/circles/$circleId'
+      fullPath: '/circles/$circleId'
+      preLoaderRoute: typeof CirclesCircleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/circles/new': {
+      id: '/circles/new'
+      path: '/circles/new'
+      fullPath: '/circles/new'
+      preLoaderRoute: typeof CirclesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +181,8 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  CirclesCircleIdRoute: CirclesCircleIdRoute,
+  CirclesNewRoute: CirclesNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

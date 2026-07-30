@@ -14,10 +14,16 @@ export interface TokenPairResponse {
 }
 
 export interface AuthMeResponse {
-  email: string
-  member_id: string
-  display_name: string | null
-  screening_state: 'pending' | 'clear' | 'review'
+  user: {
+    id: string
+    email: string
+  }
+  member: {
+    id: string
+    display_name: string | null
+    country: string
+    screening_state: 'pending' | 'clear' | 'review'
+  }
 }
 
 export interface WalletBalanceResponse {
@@ -42,20 +48,46 @@ export interface WalletActivityResponse {
   next_cursor: string | null
 }
 
-export interface WalletActionResponse {
+export interface CircleSummaryResponse {
   id: string
-  amount_minor: number
-  currency: string
+  name: string
   state: string
+  currency: string
+  contribution_amount_minor: number
+  member_count_target: number
+  cycle_count: number
+  cadence: string
+  start_date: string
+  owner_member_id: string
+  member_count: number
+  agreed_count: number
+  created_at: string
+  locked_at: string | null
+  completed_at: string | null
 }
 
-export interface WalletStatementResponse {
-  period: string
-  currency: string
-  opening_balance_minor: number
-  movement_minor: number
-  closing_balance_minor: number
-  journal_entry_ids: string[]
+export interface CircleMemberResponse {
+  member_id: string
+  role: string
+  status: string
+  joined_at: string | null
+}
+
+export interface CircleDetailResponse extends CircleSummaryResponse {
+  members: CircleMemberResponse[]
+}
+
+export interface CircleListResponse {
+  items: CircleSummaryResponse[]
+}
+
+export interface CreateCircleInput {
+  name: string
+  contribution_amount_minor: number
+  member_count_target: number
+  cycle_count: number
+  cadence: 'monthly'
+  start_date: string
 }
 
 interface ProblemDetail {
@@ -64,7 +96,9 @@ interface ProblemDetail {
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
-const sessionKey = 'ajo.session'
+const refreshSessionKey = 'ajo.refreshToken'
+
+let accessToken: string | null = null
 
 export class ApiError extends Error {
   status: number
@@ -77,37 +111,26 @@ export class ApiError extends Error {
 }
 
 export interface StoredSession {
-  accessToken: string
-  refreshToken: string
+  accessToken: string | null
+  refreshToken: string | null
 }
 
 export function readSession(): StoredSession | null {
-  const rawSession = localStorage.getItem(sessionKey)
-
-  if (!rawSession) {
+  const refreshToken = sessionStorage.getItem(refreshSessionKey)
+  if (!accessToken && !refreshToken) {
     return null
   }
-
-  try {
-    return JSON.parse(rawSession) as StoredSession
-  } catch {
-    clearSession()
-    return null
-  }
+  return { accessToken, refreshToken }
 }
 
 export function saveSession(tokenPair: TokenPairResponse) {
-  localStorage.setItem(
-    sessionKey,
-    JSON.stringify({
-      accessToken: tokenPair.access_token,
-      refreshToken: tokenPair.refresh_token,
-    }),
-  )
+  accessToken = tokenPair.access_token
+  sessionStorage.setItem(refreshSessionKey, tokenPair.refresh_token)
 }
 
 export function clearSession() {
-  localStorage.removeItem(sessionKey)
+  accessToken = null
+  sessionStorage.removeItem(refreshSessionKey)
 }
 
 export async function login(email: string, password: string): Promise<TokenPairResponse> {
@@ -140,42 +163,26 @@ export async function getWalletActivity(limit = 5): Promise<WalletActivityRespon
   return authRequest<WalletActivityResponse>(`/wallet/activity?limit=${limit}`)
 }
 
-export async function createWalletTopup(
-  amountMinor: number,
-  currency: string,
-): Promise<WalletActionResponse> {
-  return authRequest<WalletActionResponse>('/wallet/topups', {
-    method: 'POST',
-    body: JSON.stringify({ amount_minor: amountMinor, currency }),
-  })
+export async function listCircles(): Promise<CircleListResponse> {
+  return authRequest<CircleListResponse>('/circles')
 }
 
-export async function createWalletWithdrawal(
-  amountMinor: number,
-  currency: string,
-): Promise<WalletActionResponse> {
-  return authRequest<WalletActionResponse>('/wallet/withdrawals', {
-    method: 'POST',
-    body: JSON.stringify({ amount_minor: amountMinor, currency }),
-  })
+export async function getCircle(circleId: string): Promise<CircleDetailResponse> {
+  return authRequest<CircleDetailResponse>(`/circles/${encodeURIComponent(circleId)}`)
 }
 
-export async function getWalletStatement(period: string): Promise<WalletStatementResponse> {
-  return authRequest<WalletStatementResponse>(`/statements/${encodeURIComponent(period)}`)
-}
-
-export async function logoutAll() {
-  await authRequest<void>('/auth/logout-all', {
+export async function createCircle(input: CreateCircleInput): Promise<CircleDetailResponse> {
+  return authRequest<CircleDetailResponse>('/circles', {
     method: 'POST',
+    body: JSON.stringify(input),
   })
-  clearSession()
 }
 
 export async function logout() {
   const session = readSession()
   clearSession()
 
-  if (!session) {
+  if (!session?.refreshToken) {
     return
   }
 
@@ -196,10 +203,18 @@ async function authRequest<T>(path: string, options: RequestInit = {}): Promise<
     throw new ApiError('Authentication required.', 401)
   }
 
+  if (!session.accessToken) {
+    if (!session.refreshToken) {
+      throw new ApiError('Authentication required.', 401)
+    }
+    const refreshed = await refreshAccessToken(session.refreshToken)
+    return apiRequest<T>(path, options, refreshed.access_token)
+  }
+
   try {
     return await apiRequest<T>(path, options, session.accessToken)
   } catch (error) {
-    if (!(error instanceof ApiError) || error.status !== 401) {
+    if (!(error instanceof ApiError) || error.status !== 401 || !session.refreshToken) {
       throw error
     }
 
@@ -225,7 +240,7 @@ async function refreshAccessToken(refreshToken: string): Promise<TokenPairRespon
 async function apiRequest<T>(
   path: string,
   options: RequestInit = {},
-  accessToken?: string,
+  bearerToken?: string,
 ): Promise<T> {
   const method = options.method ?? 'GET'
   const headers = new Headers(options.headers)
@@ -235,8 +250,8 @@ async function apiRequest<T>(
     headers.set('Content-Type', 'application/json')
   }
 
-  if (accessToken) {
-    headers.set('Authorization', `Bearer ${accessToken}`)
+  if (bearerToken) {
+    headers.set('Authorization', `Bearer ${bearerToken}`)
   }
 
   if (method !== 'GET' && method !== 'HEAD' && !headers.has('Idempotency-Key')) {

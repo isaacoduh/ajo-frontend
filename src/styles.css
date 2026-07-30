@@ -868,6 +868,35 @@ img {
   line-height: 1.6;
 }
 
+.dashboard-hero-compact {
+  padding-bottom: 1rem;
+}
+
+.activity-row-button {
+  width: 100%;
+  cursor: pointer;
+  border: 0;
+  text-align: left;
+}
+
+.activity-row-button:hover {
+  background: rgb(31 115 183 / 6%);
+}
+
+.create-circle-section {
+  max-width: 48rem;
+}
+
+.circle-form {
+  margin-top: 1.5rem;
+}
+
+.form-grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
 @media (max-width: 900px) {
   .hero {
     min-height: 84svh;
@@ -908,7 +937,8 @@ img {
 
   .dashboard-grid,
   .wallet-action-grid,
-  .statement-summary {
+  .statement-summary,
+  .form-grid-two {
     grid-template-columns: 1fr;
   }
 
