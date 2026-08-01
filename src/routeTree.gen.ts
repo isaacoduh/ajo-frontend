@@ -13,9 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as CirclesCircleIdRouteImport } from './routes/circles.$circleId'
 import { Route as CirclesNewRouteImport } from './routes/circles.new'
+import { Route as WalletStatementsRouteImport } from './routes/wallet_.statements'
+import { Route as CirclesCircleIdJoinRouteImport } from './routes/circles.$circleId_.join'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -37,9 +41,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalletRoute = WalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CirclesCircleIdRoute = CirclesCircleIdRouteImport.update({
@@ -52,24 +66,42 @@ const CirclesNewRoute = CirclesNewRouteImport.update({
   path: '/circles/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WalletStatementsRoute = WalletStatementsRouteImport.update({
+  id: '/wallet_/statements',
+  path: '/wallet/statements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CirclesCircleIdJoinRoute = CirclesCircleIdJoinRouteImport.update({
+  id: '/circles/$circleId_/join',
+  path: '/circles/$circleId/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/wallet': typeof WalletRoute
   '/circles/$circleId': typeof CirclesCircleIdRoute
   '/circles/new': typeof CirclesNewRoute
+  '/wallet/statements': typeof WalletStatementsRoute
+  '/circles/$circleId/join': typeof CirclesCircleIdJoinRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/wallet': typeof WalletRoute
   '/circles/$circleId': typeof CirclesCircleIdRoute
   '/circles/new': typeof CirclesNewRoute
+  '/wallet/statements': typeof WalletStatementsRoute
+  '/circles/$circleId/join': typeof CirclesCircleIdJoinRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,9 +109,13 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/wallet': typeof WalletRoute
   '/circles/$circleId': typeof CirclesCircleIdRoute
   '/circles/new': typeof CirclesNewRoute
+  '/wallet_/statements': typeof WalletStatementsRoute
+  '/circles/$circleId_/join': typeof CirclesCircleIdJoinRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,27 +124,39 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/home'
     | '/login'
+    | '/profile'
     | '/register'
+    | '/wallet'
     | '/circles/$circleId'
     | '/circles/new'
+    | '/wallet/statements'
+    | '/circles/$circleId/join'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/forgot-password'
     | '/home'
     | '/login'
+    | '/profile'
     | '/register'
+    | '/wallet'
     | '/circles/$circleId'
     | '/circles/new'
+    | '/wallet/statements'
+    | '/circles/$circleId/join'
   id:
     | '__root__'
     | '/'
     | '/forgot-password'
     | '/home'
     | '/login'
+    | '/profile'
     | '/register'
+    | '/wallet'
     | '/circles/$circleId'
     | '/circles/new'
+    | '/wallet_/statements'
+    | '/circles/$circleId_/join'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,9 +164,13 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  WalletRoute: typeof WalletRoute
   CirclesCircleIdRoute: typeof CirclesCircleIdRoute
   CirclesNewRoute: typeof CirclesNewRoute
+  WalletStatementsRoute: typeof WalletStatementsRoute
+  CirclesCircleIdJoinRoute: typeof CirclesCircleIdJoinRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -151,11 +203,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/circles/$circleId': {
@@ -172,6 +238,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CirclesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wallet_/statements': {
+      id: '/wallet_/statements'
+      path: '/wallet/statements'
+      fullPath: '/wallet/statements'
+      preLoaderRoute: typeof WalletStatementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/circles/$circleId_/join': {
+      id: '/circles/$circleId_/join'
+      path: '/circles/$circleId/join'
+      fullPath: '/circles/$circleId/join'
+      preLoaderRoute: typeof CirclesCircleIdJoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -180,9 +260,13 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  WalletRoute: WalletRoute,
   CirclesCircleIdRoute: CirclesCircleIdRoute,
   CirclesNewRoute: CirclesNewRoute,
+  WalletStatementsRoute: WalletStatementsRoute,
+  CirclesCircleIdJoinRoute: CirclesCircleIdJoinRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
+import { AppShell } from '../app-shell'
+import { requireAuth } from '../auth-guard'
 import {
   type AuthMeResponse,
   type CircleListResponse,
@@ -10,11 +12,11 @@ import {
   getWalletActivity,
   getWalletBalance,
   listCircles,
-  logout,
   readSession,
 } from '../api'
+import { formatDate, formatMinor, formatSignedMinor, statusLabel } from '../format'
 
-export const Route = createFileRoute('/home')({ component: HomePage })
+export const Route = createFileRoute('/home')({ beforeLoad: requireAuth, component: HomePage })
 
 interface HomeData {
   me: AuthMeResponse
@@ -63,40 +65,15 @@ function HomePage() {
     }
   }, [navigate])
 
-  async function handleLogout() {
-    await logout()
-    void navigate({ to: '/login' })
-  }
-
   if (!homeData) {
-    return (
-      <main className="dashboard-shell">
-        <p className={errorMessage ? 'auth-error dashboard-loading' : 'dashboard-loading'} role={errorMessage ? 'alert' : undefined}>
-          {errorMessage || 'Loading dashboard...'}
-        </p>
-      </main>
-    )
+    return <LoadingState message={errorMessage || 'Loading dashboard...'} isError={Boolean(errorMessage)} />
   }
 
   const displayName = homeData.me.member.display_name ?? homeData.me.user.email
   const firstName = displayName.split(' ')[0]
 
   return (
-    <main className="dashboard-shell">
-      <header className="dashboard-header">
-        <a className="brand-mark" href="/">
-          Àjọ
-        </a>
-        <button className="dashboard-logout" type="button" onClick={handleLogout}>
-          Log out
-        </button>
-      </header>
-
-      <section className="dashboard-hero dashboard-hero-compact" aria-labelledby="dashboard-title">
-        <p className="eyebrow">Dashboard</p>
-        <h1 id="dashboard-title">Welcome, {firstName}</h1>
-      </section>
-
+    <AppShell title={`Welcome, ${firstName}`} eyebrow="Dashboard">
       <section className="dashboard-grid" aria-label="Dashboard summary">
         <article className="dashboard-card">
           <span>Wallet balance</span>
@@ -143,7 +120,7 @@ function HomePage() {
                     {circle.member_count}/{circle.member_count_target} members
                   </span>
                 </div>
-                <p>{circle.state.replaceAll('_', ' ')}</p>
+                <p>{statusLabel(circle.state)}</p>
               </button>
             ))}
           </div>
@@ -183,6 +160,16 @@ function HomePage() {
           </div>
         )}
       </section>
+    </AppShell>
+  )
+}
+
+function LoadingState({ message, isError }: { message: string; isError: boolean }) {
+  return (
+    <main className="dashboard-shell">
+      <p className={isError ? 'auth-error dashboard-loading' : 'dashboard-loading'} role={isError ? 'alert' : undefined}>
+        {message}
+      </p>
     </main>
   )
 }
@@ -195,24 +182,4 @@ function screeningLabel(screeningState: AuthMeResponse['member']['screening_stat
     return 'In review'
   }
   return 'Pending'
-}
-
-function formatMinor(amountMinor: number, currency: string) {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency,
-  }).format(amountMinor / 100)
-}
-
-function formatSignedMinor(amountMinor: number, currency: string) {
-  const sign = amountMinor > 0 ? '+' : ''
-  return `${sign}${formatMinor(amountMinor, currency)}`
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(value))
 }

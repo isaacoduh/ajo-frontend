@@ -2,12 +2,16 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 
+import { AppShell } from '../app-shell'
+import { requireAuth } from '../auth-guard'
 import { createCircle, readSession } from '../api'
+import { useToasts } from '../toasts'
 
-export const Route = createFileRoute('/circles/new')({ component: NewCirclePage })
+export const Route = createFileRoute('/circles/new')({ beforeLoad: requireAuth, component: NewCirclePage })
 
 function NewCirclePage() {
   const navigate = useNavigate()
+  const { showToast } = useToasts()
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -34,25 +38,19 @@ function NewCirclePage() {
         cadence: 'monthly',
         start_date: String(formData.get('start_date')),
       })
+      showToast('Circle created.', 'success')
       void navigate({ to: '/circles/$circleId', params: { circleId: circle.id } })
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Could not create circle.')
+      const message = error instanceof Error ? error.message : 'Could not create circle.'
+      setErrorMessage(message)
+      showToast(message, 'error')
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <main className="dashboard-shell">
-      <header className="dashboard-header">
-        <a className="brand-mark" href="/home">
-          Àjọ
-        </a>
-        <button className="dashboard-logout" type="button" onClick={() => void navigate({ to: '/home' })}>
-          Back
-        </button>
-      </header>
-
+    <AppShell title="Create a circle" eyebrow="New circle">
       <section className="dashboard-section create-circle-section" aria-labelledby="create-circle-title">
         <div className="dashboard-section-header">
           <div>
@@ -112,7 +110,7 @@ function NewCirclePage() {
           </button>
         </form>
       </section>
-    </main>
+    </AppShell>
   )
 }
 

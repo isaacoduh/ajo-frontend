@@ -4,8 +4,9 @@ import type { FormEvent } from 'react'
 
 import coverImage from '../../docs/assets/ajo-app-cover.png'
 import { register, saveSession } from '../api'
+import { redirectAuthedHome } from '../auth-guard'
 
-export const Route = createFileRoute('/register')({ component: RegisterPage })
+export const Route = createFileRoute('/register')({ beforeLoad: redirectAuthedHome, component: RegisterPage })
 
 function RegisterPage() {
   const navigate = useNavigate()

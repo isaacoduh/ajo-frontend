@@ -31,11 +31,11 @@ function ForgotPasswordPage() {
           <p className="auth-kicker">Forgot password</p>
           <h2 id="forgot-title">Reset your password</h2>
           <p className="auth-intro">
-            We will send reset instructions if the email is connected to an Àjọ
-            account.
+            Password reset is not available in this build. Contact support or
+            ask an operator to help recover account access.
           </p>
 
-          <form className="auth-form">
+          <form className="auth-form" onSubmit={(event) => event.preventDefault()}>
             <div className="field-group">
               <label htmlFor="forgot-email">Email address</label>
               <input
@@ -48,8 +48,8 @@ function ForgotPasswordPage() {
               />
             </div>
 
-            <button className="button button-primary auth-submit" type="submit">
-              Send reset link
+            <button className="button button-primary auth-submit" type="submit" disabled>
+              Reset unavailable
             </button>
           </form>
 

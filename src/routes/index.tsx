@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
 
 import coverImage from '../../docs/assets/ajo-app-cover.png'
+import { readSession } from '../api'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
 
@@ -32,6 +34,14 @@ const productNotes = [
 ]
 
 function LandingPage() {
+  const [getStartedHref, setGetStartedHref] = useState('/register')
+
+  useEffect(() => {
+    if (readSession()) {
+      setGetStartedHref('/home')
+    }
+  }, [])
+
   return (
     <main className="site-shell">
       <section
@@ -46,8 +56,7 @@ function LandingPage() {
           <nav className="nav-links" aria-label="Landing page">
             <a href="#how-it-works">How it works</a>
             <a href="#trust">Why it helps</a>
-            <a href="/login">Log in</a>
-            <a className="nav-action" href="/register">Sign up</a>
+            <a className="nav-action" href={getStartedHref}>Get started</a>
           </nav>
         </header>
 
@@ -59,7 +68,7 @@ function LandingPage() {
             together, track contributions, and know whose turn is next.
           </p>
           <div className="hero-actions" aria-label="Primary actions">
-            <a className="button button-primary" href="#join">
+            <a className="button button-primary" href={getStartedHref}>
               Start your group
             </a>
             <a className="button button-secondary" href="#how-it-works">
@@ -126,7 +135,7 @@ function LandingPage() {
           Invite your people, agree the amount, and let Àjọ help everyone stay
           clear on payments, payouts, and whose turn is coming up.
         </p>
-        <a className="button button-primary" href="/register">
+        <a className="button button-primary" href={getStartedHref}>
           Get started
         </a>
       </section>
